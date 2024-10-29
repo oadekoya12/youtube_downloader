@@ -9,7 +9,7 @@ This project provides a flexible setup to download either an entire YouTube play
 - **downloads/**: Shared directory for storing downloaded videos.
 - **Dockerfile**: Shared Dockerfile for both playlist and video downloads.
 - **requirements.txt**: Shared dependencies file.
-- **download_script.sh**: Bash script to handle both playlist and single video downloads.
+- **.script**: Bash script to handle both playlist and single video downloads.
 
 ## Requirements
 
@@ -82,30 +82,30 @@ If you are using Windows, you can run this project using **WSL**. Follow these s
 ### 1. Make the script executable
 Run the following command to make the script executable:
 ```bash
-chmod +x download_script.sh
+chmod +x .script
 ```
 ### 2. Run the script
 #### Download a YouTube Playlist
 To download a playlist, use:
 ```bash
-./download_script.sh playlist "https://www.youtube.com/watch?v=VnvRFRk_51k&list=PLy7NrYWoggjziYQIDorlXjTvvwweTYoNC"
+./.script playlist "https://www.youtube.com/watch?v=VnvRFRk_51k&list=PLy7NrYWoggjziYQIDorlXjTvvwweTYoNC"
 ```
 #### Download a Single YouTube Video
 To download a single video, use:
 ```bash
-./download_script.sh video "https://www.youtube.com/watch?v=VnvRFRk_51k"
+./.script video "https://www.youtube.com/watch?v=VnvRFRk_51k"
 ```
 ## Description
-The script (download_script.sh) automatically determines whether to download a YouTube playlist or a single video based on the command-line arguments.
+The script (.script) automatically determines whether to download a YouTube playlist or a single video based on the command-line arguments.
 
 ## Example Commands
   - Download a playlist:
   ```bash
-  ./download_script.sh playlist "https://www.youtube.com/watch?v=VnvRFRk_51k&list=[PLAYLIST_ID]"
+  ./.script playlist "https://www.youtube.com/watch?v=VnvRFRk_51k&list=[PLAYLIST_ID]"
   ```
   - Download a single video:
   ```bash
-  ./download_script.sh video "https://www.youtube.com/[VIDEO_ID]"
+  ./.script video "https://www.youtube.com/[VIDEO_ID]"
   ```
 
 ## How It Works

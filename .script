@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# Function to display usage
+usage() {
+  echo "Usage: $0 [playlist|video] [URL]"
+  echo "  playlist    Download a YouTube playlist"
+  echo "  video       Download a single YouTube video"
+  exit 1
+}
+
+# Check if two arguments are provided
+if [ "$#" -ne 2 ]; then
+  usage
+fi
+
+# Get the type of download and URL from command-line arguments
+DOWNLOAD_TYPE=$1
+DOWNLOAD_URL=$2
+
+# Switch based on the download type
+case $DOWNLOAD_TYPE in
+  playlist)
+    # Extract playlist ID from the provided URL
+    PLAYLIST_ID=$(echo "$DOWNLOAD_URL" | grep -o 'list=[^&]*' | cut -d= -f2)
+
+    if [ -z "$PLAYLIST_ID" ]; then
+      echo "Error: Invalid playlist URL. Make sure the URL contains a playlist ID."
+      exit 1
+    fi
+
+    # Set the playlist environment variable
+    export PLAYLIST_URL="$DOWNLOAD_URL"
+    
+    # Navigate to playlist downloader directory
+    cd playlist_downloader
+
+    # Run the Docker Compose for playlist download
+    docker-compose up --build --force-recreate
+
+    ../down.sh
+    ;;
+  
+  video)
+    # Set the video environment variable
+    export VIDEO_URL="$DOWNLOAD_URL"
+    
+    # Navigate to video downloader directory
+    cd video_downloader
+
+    # Run the Docker Compose for video download
+    docker-compose up --build --force-recreate
+
+    ../down.sh
+    ;;
+  
+  *)
+    usage
+    ;;
+esac
+
+# Reset ownership of the downloads directory
+sudo chown -R "$(whoami):$(id -gn $USER)" ../downloads

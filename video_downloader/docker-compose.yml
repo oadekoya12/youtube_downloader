@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  youtube-video-downloader:
+    build:
+      context: ../  # Use the parent directory to access the shared Dockerfile
+      dockerfile: Dockerfile
+    container_name: youtube-video-downloader
+    environment:
+      - VIDEO_URL=${VIDEO_URL}
+    volumes:
+      - ../downloads:/downloads  # Use the parent-level downloads directory
+    working_dir: /app/video_downloader
+    command: ["python", "download_video.py"]
+    stdin_open: true
+    tty: true
+    restart: "no"
