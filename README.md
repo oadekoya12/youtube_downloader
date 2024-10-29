@@ -88,12 +88,12 @@ chmod +x .script
 #### Download a YouTube Playlist
 To download a playlist, use:
 ```bash
-./.script playlist "https://www.youtube.com/watch?v=VnvRFRk_51k&list=PLy7NrYWoggjziYQIDorlXjTvvwweTYoNC"
+./.script playlist "https://www.youtube.com/playlist?list=${PLAYLIST_ID}"
 ```
 #### Download a Single YouTube Video
 To download a single video, use:
 ```bash
-./.script video "https://www.youtube.com/watch?v=VnvRFRk_51k"
+./.script video "https://www.youtube.com/watch?v=${VIDEO_ID}"
 ```
 ## Description
 The script (.script) automatically determines whether to download a YouTube playlist or a single video based on the command-line arguments.
@@ -101,7 +101,7 @@ The script (.script) automatically determines whether to download a YouTube play
 ## Example Commands
   - Download a playlist:
   ```bash
-  ./.script playlist "https://www.youtube.com/watch?v=VnvRFRk_51k&list=[PLAYLIST_ID]"
+  ./.script playlist "https://www.youtube.com/playlist?list=${PLAYLIST_ID}"
   ```
   - Download a single video:
   ```bash
