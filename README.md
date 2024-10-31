@@ -105,7 +105,7 @@ The script (.script) automatically determines whether to download a YouTube play
   ```
   - Download a single video:
   ```bash
-  ./.script video "https://www.youtube.com/watch?v=[VIDEO_ID]"
+  ./.script video "https://www.youtube.com/watch?v=${VIDEO_ID}"
   ```
 
 ## How It Works
