@@ -11,7 +11,8 @@ COPY requirements.txt .
 COPY transcribe_script.py .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y ffmpeg && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy the contents from the specific context directory
 COPY . .
