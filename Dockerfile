@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the shared requirements.txt from the parent directory
 COPY requirements.txt .
 
+# Copy the script into the container
+COPY transcribe_script.py .
+
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
