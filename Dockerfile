@@ -7,18 +7,18 @@ WORKDIR /app
 # Copy the shared requirements.txt from the parent directory
 COPY requirements.txt .
 
-# Copy the script into the container
-COPY transcribe_script.py .
+# Update pip and setuptools to the latest versions
+RUN pip install --upgrade pip setuptools
 
-# Install dependencies
+# Install ffmpeg and other dependencies
 RUN apt-get update && apt-get install -y ffmpeg && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy the contents from the specific context directory
+# Copy all necessary files and directories, including the script folder
 COPY . .
 
 # Create a directory for downloaded videos
 RUN mkdir -p /downloads
 
-# Set the directory for downloads as a volume
+# Set /downloads as a volume for storing downloaded videos
 VOLUME /downloads

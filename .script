@@ -20,37 +20,19 @@ DOWNLOAD_URL=$2
 # Switch based on the download type
 case $DOWNLOAD_TYPE in
   playlist)
-    # Extract playlist ID from the provided URL
-    PLAYLIST_ID=$(echo "$DOWNLOAD_URL" | grep -o 'list=[^&]*' | cut -d= -f2)
-
-    if [ -z "$PLAYLIST_ID" ]; then
-      echo "Error: Invalid playlist URL. Make sure the URL contains a playlist ID."
-      exit 1
-    fi
-
-    # Set the playlist environment variable
-    export PLAYLIST_URL="$DOWNLOAD_URL"
-    
     # Navigate to playlist downloader directory
     cd playlist_downloader
 
-    # Run the Docker Compose for playlist download
-    docker-compose up --build --force-recreate
-
-    ../down.sh
+    # Run Docker Compose with the playlist URL environment variable
+    PLAYLIST_URL="$DOWNLOAD_URL" docker-compose up --build --force-recreate
     ;;
   
   video)
-    # Set the video environment variable
-    export VIDEO_URL="$DOWNLOAD_URL"
-    
     # Navigate to video downloader directory
     cd video_downloader
 
-    # Run the Docker Compose for video download
-    docker-compose up --build --force-recreate
-
-    ../down.sh
+    # Run Docker Compose with the video URL environment variable
+    VIDEO_URL="$DOWNLOAD_URL" docker-compose up --build --force-recreate
     ;;
   
   *)

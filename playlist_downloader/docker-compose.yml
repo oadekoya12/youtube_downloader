@@ -1,17 +1,18 @@
 version: '3.8'
 
 services:
-  youtube-playlist-downloader:
+  playlist_downloader:
     build:
-      context: ../  # Use the parent directory to access the shared Dockerfile
+      context: ..
       dockerfile: Dockerfile
     container_name: youtube-playlist-downloader
     environment:
       - PLAYLIST_URL=${PLAYLIST_URL}
     volumes:
-      - ../downloads:/downloads  # Use the parent-level downloads directory
+      - ../downloads:/downloads              # Shared downloads directory
+      - ../script:/app/script                # Mount ../script as /app/script
     working_dir: /app/playlist_downloader
-    command: ["python", "download_playlist.py"]
+    command: sh -c "python download_playlist.py \"$PLAYLIST_URL\""
     stdin_open: true
     tty: true
     restart: "no"
