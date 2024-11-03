@@ -123,7 +123,7 @@ The script (.script) automatically determines whether to download a YouTube play
 ## How It Works
  - The script uses Docker Compose to run a containerized environment for downloading the specified playlist or video.
  - The downloaded files will be stored in the shared downloads directory, making it accessible from the host machine.
- - Replace the placeholder to their corrsponding Vidoe or Playlist ID
+ - Replace the placeholder to their corrsponding video or Playlist ID
 
  ## Troubleshooting
 If you encounter any issues with permissions in the downloads directory, you can reset the ownership using:
