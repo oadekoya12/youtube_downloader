@@ -2,7 +2,9 @@
 
 This project provides a flexible setup to download either an entire YouTube playlist or a single video using Docker and `yt-dlp`.
 
-## Structure
+**Disclaimer**: This tool is intended for **personal use only** with YouTube assets that you own or have permission to manage. Unauthorized downloading of content you do not own may violate YouTube’s Terms of Service. Please use responsibly and respect intellectual property rights.
+
+## Project Structure
 
 - **playlist_downloader/**: Contains files for downloading a playlist.
 - **video_downloader/**: Contains files for downloading a single video.
@@ -17,7 +19,17 @@ This project provides a flexible setup to download either an entire YouTube play
 - Docker Compose
 - Bash (for running the script)
 - WSL (for Windows users)
-- macOS/Linux Terminal (for Mac or Linux users
+- macOS/Linux Terminal (for Mac or Linux users)
+
+## Usage Instructions
+
+For any issues or suggestions regarding this project, please submit them here: [github.com/oadekoya12/youtube_downloader/issues](https://github.com/oadekoya12/youtube_downloader/issues).
+
+---
+
+For more about my work and services, visit my website: [www.hillseditorservices.com](https://www.hillseditorservices.com/).
+
+Thank you for contributing to and supporting this project!
 
 ## Environment Setup
 
