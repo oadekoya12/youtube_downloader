@@ -7,12 +7,14 @@ services:
       dockerfile: Dockerfile
     container_name: youtube-video-downloader
     environment:
-      - VIDEO_URL=${VIDEO_URL}
+      - VIDEO_URL=${VIDEO_URL:?Variable VIDEO_URL is required}
+      - ENABLE_TRANSCRIPTION=${ENABLE_TRANSCRIPTION:?Variable ENABLE_TRANSCRIPTION is required}
     volumes:
       - ../downloads:/downloads              # Shared downloads directory
       - ../script:/app/script                # Mount ../script as /app/script
+      - ../video_downloader:/app/video_downloader  # Use absolute path for video_downloader
     working_dir: /app/video_downloader
-    command: sh -c "python download_video.py \"$VIDEO_URL\""
+    command: sh -c "sh ./video.sh"
     stdin_open: true
     tty: true
     restart: "no"

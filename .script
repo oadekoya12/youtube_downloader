@@ -2,39 +2,50 @@
 
 # Function to display usage
 usage() {
-  echo "Usage: $0 [playlist|video] [URL]"
+  echo "Usage: $0 [playlist|video] [URL] [-t]"
   echo "  playlist    Download a YouTube playlist"
   echo "  video       Download a single YouTube video"
+  echo "  -t          Enable transcription after downloading (optional)"
   exit 1
 }
 
-# Check if two arguments are provided
-if [ "$#" -ne 2 ]; then
+# Check if at least two arguments are provided
+if [ "$#" -lt 2 ]; then
   usage
 fi
 
-# Get the type of download and URL from command-line arguments
+# Get the type of download, URL, and optional transcription flag
 DOWNLOAD_TYPE=$1
 DOWNLOAD_URL=$2
+ENABLE_TRANSCRIPTION="false"
+
+# Check for the optional -t flag
+if [ "$#" -eq 3 ] && [ "$3" = "-t" ]; then
+  ENABLE_TRANSCRIPTION="true"
+fi
+
+# Debugging: Output flag states
+echo "DOWNLOAD_TYPE: $DOWNLOAD_TYPE"
+echo "DOWNLOAD_URL: $DOWNLOAD_URL"
+echo "ENABLE_TRANSCRIPTION: $ENABLE_TRANSCRIPTION"
+
+# Export the environment variables
+export PLAYLIST_URL="$DOWNLOAD_URL"
+export VIDEO_URL="$DOWNLOAD_URL"
+export ENABLE_TRANSCRIPTION="$ENABLE_TRANSCRIPTION"
 
 # Switch based on the download type
 case $DOWNLOAD_TYPE in
   playlist)
-    # Navigate to playlist downloader directory
     cd playlist_downloader
-
-    # Run Docker Compose with the playlist URL environment variable
-    PLAYLIST_URL="$DOWNLOAD_URL" docker-compose up --build --force-recreate
+    docker-compose run --rm playlist_downloader
     ;;
-  
+
   video)
-    # Navigate to video downloader directory
     cd video_downloader
-
-    # Run Docker Compose with the video URL environment variable
-    VIDEO_URL="$DOWNLOAD_URL" docker-compose up --build --force-recreate
+    docker-compose run --rm video_downloader
     ;;
-  
+
   *)
     usage
     ;;
