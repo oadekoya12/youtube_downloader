@@ -1,5 +1,5 @@
 #!/bin/sh
-# docker image prune -a -f
+docker image prune -a -f
 docker container prune -f
 docker volume prune -f
 docker network prune -f

@@ -1,12 +1,16 @@
 import os
 import sys
 import argparse
+import warnings
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 
 # Add the parent script directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../script")))
 from transcribe_script import main as transcribe_video
+
+# Suppress FP16 warnings
+warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
 def download_video(url, output_dir, transcribe=False):
     ydl_opts = {
@@ -21,11 +25,11 @@ def download_video(url, output_dir, transcribe=False):
             video_path = ydl.prepare_filename(video_info)
             print(f"Downloaded {video_path}")
 
-            # Only transcribe if the flag is set to True
-            print(f"Transcription flag is: {transcribe}")
+            # Transcribe in chunks if the flag is set to True
             if transcribe:
+                print("Transcribing video in chunks...")
                 transcribe_video(video_path)
-                print(f"Transcribed {video_path}")
+                print(f"Transcription completed for {video_path}")
             else:
                 print("Skipping transcription.")
 
@@ -42,15 +46,7 @@ def main():
     parser = argparse.ArgumentParser(description="Download a YouTube video with optional transcription.")
     parser.add_argument("url", help="The URL of the YouTube video to download")
     parser.add_argument("-t", "--transcribe", action="store_true", help="Enable transcription after downloading")
-
-    # Debug: Print raw args for verification
-    print("Raw sys.argv:", sys.argv)
-
-    try:
-        args = parser.parse_args()
-    except argparse.ArgumentError as e:
-        print("Argument parsing error:", e)
-        sys.exit(1)
+    args = parser.parse_args()
 
     output_dir = "/downloads"
     os.makedirs(output_dir, exist_ok=True)

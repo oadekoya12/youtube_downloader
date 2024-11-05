@@ -4,17 +4,14 @@ FROM python:3.10-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the shared requirements.txt from the parent directory
-COPY requirements.txt .
-
-# Update pip and setuptools to the latest versions
-RUN pip install --upgrade pip setuptools
-
 # Install ffmpeg and other dependencies
-RUN apt-get update && apt-get install -y ffmpeg && \
-    pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y ffmpeg
 
-# Copy all necessary files and directories, including the script folder
+# Copy the requirements file and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code
 COPY . .
 
 # Create a directory for downloaded videos

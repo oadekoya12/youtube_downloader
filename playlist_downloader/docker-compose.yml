@@ -12,9 +12,13 @@ services:
     volumes:
       - ../downloads:/downloads              # Shared downloads directory
       - ../script:/app/script                # Mount ../script as /app/script
-      - ../playlist_downloader:/app/playlist_downloader  # Mount playlist_downloader directory
+      - ../playlist_downloader:/app/playlist_downloader  # Use absolute path for playlist_downloader
     working_dir: /app/playlist_downloader
-    command: sh -c "sh ./playlist.sh"
+    command: sh -c "ls -al /app/playlist_downloader && sh ./playlist.sh"
     stdin_open: true
     tty: true
     restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 1g  # Adjust memory as needed

@@ -34,16 +34,19 @@ export PLAYLIST_URL="$DOWNLOAD_URL"
 export VIDEO_URL="$DOWNLOAD_URL"
 export ENABLE_TRANSCRIPTION="$ENABLE_TRANSCRIPTION"
 
+# Redirect error logs to error_log.txt
+ERROR_LOG_FILE="../error_log.txt"
+
 # Switch based on the download type
 case $DOWNLOAD_TYPE in
   playlist)
     cd playlist_downloader
-    docker-compose run --rm playlist_downloader
+    docker-compose run --rm playlist_downloader 2>>"$ERROR_LOG_FILE"
     ;;
 
   video)
     cd video_downloader
-    docker-compose run --rm video_downloader
+    docker-compose run --rm video_downloader 2>>"$ERROR_LOG_FILE"
     ;;
 
   *)

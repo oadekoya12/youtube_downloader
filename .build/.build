@@ -3,8 +3,8 @@
 # Step 1: Build the Docker image
 docker build -f .build/Dockerfile -t hillseditor/dl_yt:latest .
 
-# Step 2: Log in to Docker Hub using the provided token and username
-cat ${TOKENDH} | docker login --username ${USERDH} --password-stdin
+# # Step 2: Log in to Docker Hub using the provided token and username
+# echo  ${TOKENDH} | docker login --username ${USERDH} --password-stdin
 
-# Step 3: Push the image to Docker Hub
-docker push hillseditor/dl_yt:latest
+# # Step 3: Push the image to Docker Hub
+# docker push hillseditor/dl_yt:latest
