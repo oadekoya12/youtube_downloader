@@ -1,7 +1,10 @@
 #!/bin/sh
 
 # Step 1: Build the Docker image
-docker build -f .build/Dockerfile -t hillseditor/dl_yt:latest .
+docker build -f .build/Dockerfile -t hillseditor/dl_yt:latest \
+    --build-arg UUID=${UUID} \
+    --build-arg GUID=${GUID} .
+
 
 Step 2: Log in to Docker Hub using the provided token and username
 echo  ${TOKENDH} | docker login --username ${USERDH} --password-stdin

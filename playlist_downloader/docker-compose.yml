@@ -3,22 +3,40 @@ version: '3.8'
 services:
   playlist_downloader:
     build:
-      context: ..
-      dockerfile: Dockerfile
+      context: ..                # Builds from the parent directory
+      dockerfile: Dockerfile      # Specifies the Dockerfile location
+      args:
+        UUID: ${UUID:?UUID is required}      # Passes UUID from host environment
+        GUID: ${GUID:?GUID is required}      # Passes GUID from host environment
+        
     container_name: youtube-playlist-downloader
+
+    # Environment variables for the application
     environment:
       - PLAYLIST_URL=${PLAYLIST_URL:?Variable PLAYLIST_URL is required}
       - ENABLE_TRANSCRIPTION=${ENABLE_TRANSCRIPTION:?Variable ENABLE_TRANSCRIPTION is required}
+      
+    # Mounting necessary directories securely
     volumes:
-      - ../downloads:/downloads              # Shared downloads directory
-      - ../script:/app/script                # Mount ../script as /app/script
-      - ../playlist_downloader:/app/playlist_downloader  # Use absolute path for playlist_downloader
+      - ../downloads:/downloads:rw             # Shared downloads directory with read-write permissions
+      - ../script:/app/script:ro               # Mount ../script as /app/script in read-only mode
+      - ../playlist_downloader:/app/playlist_downloader:ro  # Use absolute path for playlist_downloader in read-only mode
+
     working_dir: /app/playlist_downloader
-    command: sh -c "ls -al /app/playlist_downloader && sh ./playlist.sh"
+
+    # Command to list contents and run the main script
+    command: sh -c "sh ./playlist.sh"
+
+    # Capability security settings: Drops all Linux capabilities to minimize security risks
+    cap_drop:
+      - ALL  # Drops all capabilities to enhance container security
+
+    # Restart policy and resource constraints for stability and security
     stdin_open: true
     tty: true
     restart: "no"
+
     deploy:
       resources:
         limits:
-          memory: 1g  # Adjust memory as needed
+          memory: 2g  # Restricts container memory usage to 2GB
