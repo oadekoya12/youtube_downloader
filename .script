@@ -14,6 +14,16 @@ if [ "$#" -lt 2 ]; then
   usage
 fi
 
+# Get the current user's User ID and Group ID
+UUID=$(id -u)
+GUID=$(id -g)
+
+# Export them as environment variables
+export UUID
+export GUID
+
+mkdir -p downloads
+
 # Get the type of download, URL, and optional transcription flag
 DOWNLOAD_TYPE=$1
 DOWNLOAD_URL=$2
