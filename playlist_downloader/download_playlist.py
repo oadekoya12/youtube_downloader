@@ -2,8 +2,9 @@ import os
 import sys
 import argparse
 import warnings
+import logging
 from yt_dlp import YoutubeDL
-from yt_dlp.utils import DownloadError
+from yt_dlp.utils import DownloadError, ExtractorError
 
 # Add the parent script directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../script")))
@@ -12,45 +13,67 @@ from transcribe_script import main as transcribe_video
 # Suppress FP16 warnings
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
+# Define the path for the log file within a writable directory
+log_file_path = os.path.join('/downloads', 'error_log.txt')
+
+# Ensure the directory exists
+os.makedirs('/downloads', exist_ok=True)
+
+# Configure logging to write to the specified file
+logging.basicConfig(
+    filename=log_file_path,
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filemode='a'  # Open the log file in append mode
+)
+
 def download_playlist(playlist_url, output_dir, transcribe=False):
     ydl_opts = {
         'format': 'best',
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
+        'ignoreerrors': True,  # Continue on download errors
+        'quiet': True,
     }
 
     with YoutubeDL(ydl_opts) as ydl:
         try:
-            print(f"Attempting to download playlist: {playlist_url}")
+            logging.info(f"Attempting to download playlist: {playlist_url}")
             info_dict = ydl.extract_info(playlist_url, download=False)
 
-            for entry in info_dict['entries']:
-                video_url = entry['webpage_url']
-                print(f"Downloading video: {video_url}")
-                
+            for entry in info_dict.get('entries', []):
+                if entry is None:
+                    # Video is unavailable
+                    logging.warning(f"Video unavailable in playlist: {playlist_url}")
+                    continue
+
+                video_url = entry.get('webpage_url')
+                if not video_url:
+                    logging.warning(f"Missing video URL in playlist entry: {entry}")
+                    continue
+
+                logging.info(f"Downloading video: {video_url}")
                 try:
                     video_info = ydl.extract_info(video_url, download=True)
                     video_path = ydl.prepare_filename(video_info)
-                    print(f"Downloaded {video_path}")
+                    logging.info(f"Downloaded {video_path}")
 
-                    # Transcribe in chunks if the flag is set to True
                     if transcribe:
-                        print(f"Transcribing video in chunks for {video_path}...")
+                        logging.info(f"Transcribing video: {video_path}")
                         transcribe_video(video_path)
-                        print(f"Transcription completed for {video_path}")
+                        logging.info(f"Transcription completed for {video_path}")
                     else:
-                        print("Skipping transcription.")
+                        logging.info("Skipping transcription.")
 
-                except DownloadError as e:
-                    print(f"Error encountered for video URL: {video_url}")
+                except (DownloadError, ExtractorError) as e:
+                    logging.error(f"Error downloading video {video_url}: {e}")
                     log_error(video_url, str(e))
 
-        except DownloadError as e:
-            print(f"Error encountered for playlist URL: {playlist_url}")
+        except (DownloadError, ExtractorError) as e:
+            logging.error(f"Error processing playlist {playlist_url}: {e}")
             log_error(playlist_url, str(e))
 
 def log_error(url, error_message):
-    with open("download.log", "a") as log_file:
-        log_file.write(f"URL: {url}\nError Details: {error_message}\n\n")
+    logging.error(f"URL: {url}\nError Details: {error_message}\n")
     print(f"Logged error for URL: {url}")
 
 def main():
@@ -62,7 +85,6 @@ def main():
     output_dir = "/downloads"
     os.makedirs(output_dir, exist_ok=True)
 
-    # Ensure transcription is only triggered when the -t flag is passed
     download_playlist(args.url, output_dir, transcribe=args.transcribe)
 
 if __name__ == "__main__":

@@ -144,3 +144,12 @@ sudo chown -R $(whoami):$(id -gn $USER) downloads
 ## License
 
 MIT License
+
+## Project Updates
+
+**November 21, 2024**
+
+- **Enhanced Error Handling:** Improved the application's ability to gracefully handle and log errors, especially when encountering private or hidden videos within playlists. This ensures uninterrupted processing of available videos.
+
+- **Logging Enhancements:** Updated the logging mechanism to direct error logs to `error_log.txt` within the `/downloads` directory. This change resolves previous permission issues and ensures that logs are properly recorded.
+
