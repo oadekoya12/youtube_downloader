@@ -1,16 +1,4 @@
-a#!/bin/bash
-
-# Enable strict error handling
-set -e
-
-# Function to handle errors
-handle_error() {
-  echo "An error occurred on line $LINENO. Check $ERROR_LOG_FILE for details."
-  exit 1
-}
-
-# Trap errors to execute the handle_error function
-trap 'handle_error' ERR
+#!/bin/bash
 
 # Function to display usage instructions
 usage() {
@@ -44,40 +32,16 @@ export ENABLE_TRANSCRIPTION
 mkdir -p downloads
 
 # Define the error log file path
-ERROR_LOG_FILE="../error_log.txt"
+ERROR_LOG_FILE="error_log.txt"
 
 # Function to start a docker-compose service
 start_service() {
   local service_dir=$1
-
-  # Check if docker-compose.yml exists
-  if [ ! -f "$service_dir/docker-compose.yml" ]; then
-    echo "docker-compose.yml not found in $service_dir. Please ensure the file exists and try again."
-    exit 1
-  fi
-
   (
     cd "$service_dir" || exit
     docker-compose up -d 2>>"$ERROR_LOG_FILE"
-
-    # Verify services are running
-    if ! docker-compose ps | grep -q 'Up'; then
-      echo "Failed to start services in $service_dir. Check $ERROR_LOG_FILE for details."
-      exit 1
-    fi
   )
 }
-
-# Verify Docker is installed and running
-if ! command -v docker &> /dev/null; then
-  echo "Docker is not installed. Please install Docker and try again."
-  exit 1
-fi
-
-if ! systemctl is-active --quiet docker; then
-  echo "Docker daemon is not running. Please start the Docker daemon and try again."
-  exit 1
-fi
 
 # Determine which service to start based on the download type
 case $DOWNLOAD_TYPE in

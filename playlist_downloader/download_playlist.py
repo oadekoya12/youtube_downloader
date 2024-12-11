@@ -3,6 +3,7 @@ import sys
 import argparse
 import warnings
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError, ExtractorError
 
@@ -27,12 +28,33 @@ logging.basicConfig(
     filemode='a'  # Open the log file in append mode
 )
 
-def download_playlist(playlist_url, output_dir, transcribe=False):
+def download_and_transcribe(video_url, ydl_opts, transcribe):
+    with YoutubeDL(ydl_opts) as ydl:
+        try:
+            logging.info(f"Downloading video: {video_url}")
+            video_info = ydl.extract_info(video_url, download=True)
+            video_path = ydl.prepare_filename(video_info)
+            logging.info(f"Downloaded {video_path}")
+
+            if transcribe:
+                logging.info(f"Transcribing video: {video_path}")
+                transcribe_video(video_path)
+                logging.info(f"Transcription completed for {video_path}")
+            else:
+                logging.info("Skipping transcription.")
+
+        except (DownloadError, ExtractorError) as e:
+            logging.error(f"Error downloading video {video_url}: {e}")
+            log_error(video_url, str(e))
+
+def download_playlist(playlist_url, output_dir, transcribe=False, max_workers=4):
     ydl_opts = {
         'format': 'best',
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'ignoreerrors': True,  # Continue on download errors
         'quiet': True,
+        'extractor_retries': 10,  # Increase the number of retries for extractor errors
+        'verbose': True,  # Enable verbose logging
     }
 
     with YoutubeDL(ydl_opts) as ydl:
@@ -40,33 +62,24 @@ def download_playlist(playlist_url, output_dir, transcribe=False):
             logging.info(f"Attempting to download playlist: {playlist_url}")
             info_dict = ydl.extract_info(playlist_url, download=False)
 
-            for entry in info_dict.get('entries', []):
-                if entry is None:
-                    # Video is unavailable
-                    logging.warning(f"Video unavailable in playlist: {playlist_url}")
-                    continue
+            video_urls = [
+                entry.get('webpage_url') for entry in info_dict.get('entries', [])
+                if entry and entry.get('webpage_url')
+            ]
 
-                video_url = entry.get('webpage_url')
-                if not video_url:
-                    logging.warning(f"Missing video URL in playlist entry: {entry}")
-                    continue
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = {
+                    executor.submit(download_and_transcribe, url, ydl_opts, transcribe): url
+                    for url in video_urls
+                }
 
-                logging.info(f"Downloading video: {video_url}")
-                try:
-                    video_info = ydl.extract_info(video_url, download=True)
-                    video_path = ydl.prepare_filename(video_info)
-                    logging.info(f"Downloaded {video_path}")
-
-                    if transcribe:
-                        logging.info(f"Transcribing video: {video_path}")
-                        transcribe_video(video_path)
-                        logging.info(f"Transcription completed for {video_path}")
-                    else:
-                        logging.info("Skipping transcription.")
-
-                except (DownloadError, ExtractorError) as e:
-                    logging.error(f"Error downloading video {video_url}: {e}")
-                    log_error(video_url, str(e))
+                for future in as_completed(futures):
+                    url = futures[future]
+                    try:
+                        future.result()
+                    except Exception as e:
+                        logging.error(f"Error processing video {url}: {e}")
+                        log_error(url, str(e))
 
         except (DownloadError, ExtractorError) as e:
             logging.error(f"Error processing playlist {playlist_url}: {e}")
@@ -80,12 +93,13 @@ def main():
     parser = argparse.ArgumentParser(description="Download a YouTube playlist with optional transcription.")
     parser.add_argument("url", help="The URL of the YouTube playlist to download")
     parser.add_argument("-t", "--transcribe", action="store_true", help="Enable transcription after downloading each video")
+    parser.add_argument("-w", "--workers", type=int, default=4, help="Number of parallel download/transcription workers")
     args = parser.parse_args()
 
     output_dir = "/downloads"
     os.makedirs(output_dir, exist_ok=True)
 
-    download_playlist(args.url, output_dir, transcribe=args.transcribe)
+    download_playlist(args.url, output_dir, transcribe=args.transcribe, max_workers=args.workers)
 
 if __name__ == "__main__":
     main()

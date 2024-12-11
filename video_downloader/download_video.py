@@ -32,6 +32,8 @@ def download_video(url, output_dir, transcribe=False):
         'format': 'best',
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'quiet': True,
+        'extractor_retries': 10,  # Increase the number of retries for extractor errors
+        'verbose': True,          # Enable verbose logging
     }
 
     with YoutubeDL(ydl_opts) as ydl:
