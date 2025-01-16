@@ -8,24 +8,24 @@ GUID=${GUID:-1000}
 docker build -f .build/Dockerfile -t hillseditor/dl_yt:latest \
     --build-arg UUID=${UUID} \
     --build-arg GUID=${GUID} .
-# if [ $? -ne 0 ]; then
-#     echo "Docker build failed."
-#     exit 1
-# fi
+if [ $? -ne 0 ]; then
+    echo "Docker build failed."
+    exit 1
+fi
 
-# # Step 2: Log in to Docker Hub using the provided token and username
-# echo ${TOKENDH} | docker login --username ${USERDH} --password-stdin
-# if [ $? -ne 0 ]; then
-#     echo "Docker login failed."
-#     exit 1
-# fi
+# Step 2: Log in to Docker Hub using the provided token and username
+echo ${TOKENDH} | docker login --username ${USERDH} --password-stdin
+if [ $? -ne 0 ]; then
+    echo "Docker login failed."
+    exit 1
+fi
 
-# # Step 3: Push the image to Docker Hub
-# docker push hillseditor/dl_yt:latest
-# if [ $? -ne 0 ]; then
-#     echo "Docker push failed."
-#     exit 1
-# fi
+# Step 3: Push the image to Docker Hub
+docker push hillseditor/dl_yt:latest
+if [ $? -ne 0 ]; then
+    echo "Docker push failed."
+    exit 1
+fi
 
-# # Step 4: Log out from Docker Hub
-# docker logout
+# Step 4: Log out from Docker Hub
+docker logout

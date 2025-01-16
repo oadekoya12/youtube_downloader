@@ -1,4 +1,4 @@
-a#!/bin/bash
+#!/bin/bash
 
 # Enable strict error handling
 set -e
@@ -36,19 +36,37 @@ if [ "$#" -eq 3 ] && [ "$3" = "-t" ]; then
   ENABLE_TRANSCRIPTION="true"
 fi
 
-# Export environment variables for use within Docker containers
-export DOWNLOAD_URL
-export ENABLE_TRANSCRIPTION
-
 # Create a downloads directory if it doesn't exist
 mkdir -p downloads
 
 # Define the error log file path
 ERROR_LOG_FILE="../error_log.txt"
 
+# Function to stop and remove a Docker container if it exists
+manage_container() {
+  local container_name=$1
+
+  # Check if the container exists
+  if [ "$(docker ps -a -q -f name=^/${container_name}$)" ]; then
+    # Check if the container is running
+    if [ "$(docker ps -q -f name=^/${container_name}$)" ]; then
+      echo "Stopping running container: $container_name"
+      docker stop "$container_name"
+    fi
+    echo "Removing container: $container_name"
+    docker rm "$container_name"
+  else
+    echo "No existing container named $container_name found."
+  fi
+}
+
 # Function to start a docker-compose service
 start_service() {
   local service_dir=$1
+  local container_name=$2
+
+  # Manage existing container
+  manage_container "$container_name"
 
   # Check if docker-compose.yml exists
   if [ ! -f "$service_dir/docker-compose.yml" ]; then
@@ -58,6 +76,17 @@ start_service() {
 
   (
     cd "$service_dir" || exit
+
+    # Pull the latest images
+    echo "Pulling the latest images for $service_dir..."
+    docker-compose pull 2>>"$ERROR_LOG_FILE"
+
+    # Build the services to ensure the latest images are used
+    echo "Building the services in $service_dir..."
+    docker-compose build --pull 2>>"$ERROR_LOG_FILE"
+
+    # Start the services
+    echo "Starting the services in $service_dir..."
     docker-compose up -d 2>>"$ERROR_LOG_FILE"
 
     # Verify services are running
@@ -79,13 +108,17 @@ if ! systemctl is-active --quiet docker; then
   exit 1
 fi
 
-# Determine which service to start based on the download type
+# Set environment variables based on download type
 case $DOWNLOAD_TYPE in
   playlist)
-    start_service "playlist_downloader"
+    export PLAYLIST_URL=$DOWNLOAD_URL
+    export ENABLE_TRANSCRIPTION
+    start_service "playlist_downloader" "youtube-playlist-downloader"
     ;;
   video)
-    start_service "video_downloader"
+    export VIDEO_URL=$DOWNLOAD_URL
+    export ENABLE_TRANSCRIPTION
+    start_service "video_downloader" "youtube-video-downloader"
     ;;
   *)
     usage
