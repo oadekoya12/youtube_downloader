@@ -60,7 +60,7 @@ manage_container() {
   fi
 }
 
-# Function to start a docker-compose service
+# Function to start a docker compose service
 start_service() {
   local service_dir=$1
   local container_name=$2
@@ -68,9 +68,9 @@ start_service() {
   # Manage existing container
   manage_container "$container_name"
 
-  # Check if docker-compose.yml exists
+  # Check if docker compose.yml exists
   if [ ! -f "$service_dir/docker-compose.yml" ]; then
-    echo "docker-compose.yml not found in $service_dir. Please ensure the file exists and try again."
+    echo "docker compose.yml not found in $service_dir. Please ensure the file exists and try again."
     exit 1
   fi
 
@@ -79,18 +79,18 @@ start_service() {
 
     # Pull the latest images
     echo "Pulling the latest images for $service_dir..."
-    docker-compose pull 2>>"$ERROR_LOG_FILE"
+    docker compose pull 2>>"$ERROR_LOG_FILE"
 
     # Build the services to ensure the latest images are used
     echo "Building the services in $service_dir..."
-    docker-compose build --pull 2>>"$ERROR_LOG_FILE"
+    docker compose build --pull 2>>"$ERROR_LOG_FILE"
 
     # Start the services
     echo "Starting the services in $service_dir..."
-    docker-compose up -d 2>>"$ERROR_LOG_FILE"
+    docker compose up -d 2>>"$ERROR_LOG_FILE"
 
     # Verify services are running
-    if ! docker-compose ps | grep -q 'Up'; then
+    if ! docker compose ps | grep -q 'Up'; then
       echo "Failed to start services in $service_dir. Check $ERROR_LOG_FILE for details."
       exit 1
     fi
@@ -103,7 +103,7 @@ if ! command -v docker &> /dev/null; then
   exit 1
 fi
 
-if ! systemctl is-active --quiet docker; then
+if ! ps aux | grep dockerd; then
   echo "Docker daemon is not running. Please start the Docker daemon and try again."
   exit 1
 fi
