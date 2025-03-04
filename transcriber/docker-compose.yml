@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  transcriber:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        UUID: ${UUID:-1000}
+        GUID: ${GUID:-1000}
+    container_name: youtube-transcriber
+    environment:
+      - LOCAL_VIDEO_PATH=${LOCAL_VIDEO_PATH:?Variable LOCAL_VIDEO_PATH is required}
+    volumes:
+      - ../downloads/transcribe:/local_videos:rw
+      - ../script:/app/script:ro
+      - ../transcriber:/app/transcriber:ro
+    working_dir: /app
+    command: sh -c "python transcriber/transcribe_script.py directory /local_videos"
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 3g
