@@ -107,6 +107,11 @@ chmod +x .script
 ./.script video "https://www.youtube.com/watch?v=${VIDEO_ID}"
 ```
 
+#### Process Local Videos for Transcription
+```bash
+./.script local "./downloads/transcribe/"
+```
+
 ## Description
 The `.script` file automatically determines whether to download a YouTube playlist or a single video based on the command-line arguments. It also supports an optional transcription flag (`-t`) for both types of downloads.
 
@@ -118,6 +123,10 @@ The `.script` file automatically determines whether to download a YouTube playli
   - Download a single video:
     ```bash
     ./.script video "https://www.youtube.com/watch?v=${VIDEO_ID}"
+    ```
+  - Process Local Videos for Transcription:
+    ```bash
+    ./.script local "./downloads/transcribe/"
     ```
 
 ## How It Works
