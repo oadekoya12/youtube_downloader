@@ -29,7 +29,7 @@ logging.basicConfig(
 
 def download_video(url, output_dir, transcribe=False):
     ydl_opts = {
-        'format': 'best',
+        'format': 'bestvideo+bestaudio/best',
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'quiet': True,
         'extractor_retries': 10,  # Increase the number of retries for extractor errors

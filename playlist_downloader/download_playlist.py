@@ -49,7 +49,7 @@ def download_and_transcribe(video_url, ydl_opts, transcribe):
 
 def download_playlist(playlist_url, output_dir, transcribe=False, max_workers=4):
     ydl_opts = {
-        'format': 'best',
+        'format': 'bestvideo+bestaudio/best',
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'ignoreerrors': True,  # Continue on download errors
         'quiet': True,
