@@ -1,5 +1,5 @@
 # Use a minimal, official Python base image with slim version for reduced size
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 # Accept UUID and GUID as build arguments with no default values
 ARG UUID=1000
