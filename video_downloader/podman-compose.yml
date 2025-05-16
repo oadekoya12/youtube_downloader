@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  video_downloader:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        UUID: ${UUID:?UUID is required}  
+        GUID: ${GUID:?GUID is required}  
+
+    container_name: youtube-video-downloader
+
+    environment:
+      - VIDEO_URL=${VIDEO_URL:?Variable VIDEO_URL is required}
+      - ENABLE_TRANSCRIPTION=${ENABLE_TRANSCRIPTION:?Variable ENABLE_TRANSCRIPTION is required}
+
+    volumes:
+      - ../downloads:/downloads:rw             
+      - ../script:/app/script:ro               
+      - ../video_downloader:/app/video_downloader:ro  
+
+    working_dir: /app/video_downloader
+    command: sh -c "sh ./video.sh"
+
+    cap_drop:
+      - ALL  
+
+    stdin_open: true
+    tty: true
+    restart: "no"
+
+    deploy:
+      resources:
+        limits:
+          memory: 3g  

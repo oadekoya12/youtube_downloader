@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  playlist_downloader:
+    build:
+      context: ..                
+      dockerfile: Dockerfile      
+      args:
+        UUID: ${UUID:?UUID is required}      
+        GUID: ${GUID:?GUID is required}      
+        
+    container_name: youtube-playlist-downloader
+
+    environment:
+      - PLAYLIST_URL=${PLAYLIST_URL:?Variable PLAYLIST_URL is required}
+      - ENABLE_TRANSCRIPTION=${ENABLE_TRANSCRIPTION:?Variable ENABLE_TRANSCRIPTION is required}
+      
+    volumes:
+      - ../downloads:/downloads:rw             
+      - ../script:/app/script:ro               
+      - ../playlist_downloader:/app/playlist_downloader:ro  
+
+    working_dir: /app/playlist_downloader
+    command: sh -c "sh ./playlist.sh"
+
+    cap_drop:
+      - ALL  
+
+    stdin_open: true
+    tty: true
+    restart: "no"
+
+    deploy:
+      resources:
+        limits:
+          memory: 2g  
