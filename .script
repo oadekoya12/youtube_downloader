@@ -15,11 +15,12 @@ trap 'handle_error' ERR
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 [playlist|video|local] [URL_or_path] [-t]"
+  echo "Usage: $0 [playlist|video|local|audio] [URL_or_path] [-t]"
   echo "  playlist    Download a YouTube playlist"
   echo "  video       Download a single YouTube video"
   echo "  local       Process local video file(s) for transcription"
-  echo "  -t          Enable transcription after downloading (optional; not required for local mode)"
+  echo "  audio       Transcribe local audio file(s) into text"
+  echo "  -t          Enable transcription after downloading (optional; not required for local/audio mode)"
   exit 1
 }
 
@@ -153,13 +154,34 @@ case $MODE in
       exit 1
     fi
     ;;
+  audio)
+    # Check if the TARGET is a valid directory
+    if [ ! -d "$TARGET" ]; then
+      echo "Error: $TARGET is not a valid directory."
+      rm -f "$LOCKFILE"
+      exit 1
+    fi
+
+    # Iterate through audio files and transcribe
+    find "$TARGET" -type f \( -iname "*.mp3" -o -iname "*.wav" -o -iname "*.ogg" \) | while read -r audio_file; do
+      base_name=$(basename "$audio_file")
+      output_file="${audio_file%.*}.txt"
+      echo "Transcribing $base_name..."
+      whisper "$audio_file" --model base --output_format txt --output_dir "$(dirname "$audio_file")" 2>>"$ERROR_LOG_FILE"
+      if [ $? -ne 0 ]; then
+        echo "Failed to transcribe $base_name. Check $ERROR_LOG_FILE for details."
+      else
+        echo "Transcription saved to $output_file"
+      fi
+    done
+    ;;
   *)
     usage
     ;;
 esac
 
-# Wait for all background processes to finish (skip wait in local mode to avoid blocking)
-if [ "$MODE" != "local" ]; then
+# Wait for all background processes to finish (skip wait in local/audio mode to avoid blocking)
+if [ "$MODE" != "local" ] && [ "$MODE" != "audio" ]; then
   wait
 fi
 

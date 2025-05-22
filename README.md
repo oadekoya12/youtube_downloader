@@ -128,7 +128,10 @@ The `.script` file automatically determines whether to download a YouTube playli
     ```bash
     ./.script local "./downloads/transcribe/"
     ```
-
+  - To extract transcripts from audio files:
+    ```bash
+    ./.script audio "./downloads/audio/"
+    ```
 ## How It Works
 
 - The `.script` uses Docker Compose to run a containerized environment for downloading the specified playlist or video.
