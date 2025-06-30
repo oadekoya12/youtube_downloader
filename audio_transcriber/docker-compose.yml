@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  audio_transcriber:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        UUID: ${UUID:?UUID is required}
+        GUID: ${GUID:?GUID is required}
+
+    container_name: youtube-audio-transcriber
+
+    environment:
+      - AUDIO_PATH=${AUDIO_PATH:?Variable AUDIO_PATH is required}
+
+    volumes:
+      - ../downloads:/downloads:rw
+      - ../script:/app/script:ro
+      - ../audio_transcriber:/app/audio_transcriber:ro
+
+    working_dir: /app/audio_transcriber
+
+    command: >
+      sh -c "apt-get update && 
+      apt-get install -y ffmpeg && 
+      pip install openai-whisper && 
+      python transcribe.py \"$AUDIO_PATH\""
+
+    cap_drop:
+      - ALL
+
+    stdin_open: true
+    tty: true
+    restart: "no"
+
+    deploy:
+      resources:
+        limits:
+          memory: 3g
