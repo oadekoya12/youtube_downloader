@@ -39,4 +39,5 @@ services:
     deploy:
       resources:
         limits:
-          memory: 3g  # Restricts container memory usage to 3GB
+          memory: 2.5g  # Restricts container memory usage to 3GB
+          # memory_swap: 2g  # A+llows 1GB swap space

@@ -19,13 +19,13 @@ while getopts "p" opt; do
 done
 
 # Step 1: Build the Docker image
-# docker build -f .build/Dockerfile -t hillseditor/dl_yt:latest \
-#     --build-arg UUID=${UUID} \
-#     --build-arg GUID=${GUID} .
-# if [ $? -ne 0 ]; then
-#     echo "Docker build failed."
-#     exit 1
-# fi
+docker build -f .build/Dockerfile -t hillseditor/dl_yt:latest \
+    --build-arg UUID=${UUID} \
+    --build-arg GUID=${GUID} .
+if [ $? -ne 0 ]; then
+    echo "Docker build failed."
+    exit 1
+fi
 
 # Step 2: Log in to Docker Hub using the provided token and username
 MAX_RETRIES=3
