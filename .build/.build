@@ -1,9 +1,16 @@
 #!/bin/sh
+# for safer execution
+# set -euo pipefail  # has this error set: Illegal option -o pipefail
+set -eu pipefail
 
 # Set default values if not provided
 UUID=${UUID:-1000}
 GUID=${GUID:-1000}
-PUSH=false
+PUSH=
+
+# Validate required environment variables
+: "${USERDH:?USERDH is required}"
+: "${TOKENDH:?TOKENDH is required}"
 
 # Parse command-line arguments
 while getopts "p" opt; do
@@ -27,6 +34,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Step 1.5: Tag with Git commit or timestamp
+TAG=$(git rev-parse --short HEAD 2>/dev/null || date +%s)
+docker tag hillseditor/dl_yt:latest hillseditor/dl_yt:$TAG
+
 # Step 2: Log in to Docker Hub using the provided token and username
 MAX_RETRIES=3
 COUNT=0
@@ -49,6 +60,7 @@ fi
 # Step 3: Conditionally push the image to Docker Hub if -p flag is set
 if [ "$PUSH" = true ]; then
     docker push hillseditor/dl_yt:latest
+    docker push hillseditor/dl_yt:$TAG
     if [ $? -ne 0 ]; then
         echo "Docker push failed."
         exit 1
