@@ -7,3 +7,48 @@ VIDEO_ID='nJ25yl34Uqw'
 ./parallel_container_run.sh video "https://www.youtube.com/watch?v=${VIDEO_ID}"
 
 --------------------------------------
+
+--------
+time  ./.script playlist "https://www.youtube.com/playlist?list=PLnfRQETJ0oTU9VS1_SAKlCS8WNY1Ol-xq"
+time  ./.script playlist "https://www.youtube.com/playlist?list=PLnfRQETJ0oTU9VS1_SAKlCS8WNY1Ol-xq" -t
+
+
+transcribe automatically
+time ./.script video "https://www.youtube.com/watch?v=esV2KGJKjXk"
+
+===
+create error exit 1
+time ./.script video "https://www.youtube.com/watch?v=esV2KGJKjXk" -t
+
+
+sudo ls -al &&  ./.script video "https://www.youtube.com/watch?v=F0GQ0l2NfHA" -t
+
+--------------
+https://www.youtube.com/playlist?list=PLMSXjIJtRYmK-s8kzDyqEoTrAKRss5-7M
+
+PLAYLIST_ID='PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY'
+PLAYLIST_ID='PLArH6NjfKsUhgIcL4DKH1wvAgggQD-NYl'
+PLAYLIST_ID='PLArH6NjfKsUjkUZFJCHRLp7dneAY-U85L'
+PLAYLIST_ID='PLArH6NjfKsUjUXVkpmV4a9E7_Odr1hDlY'
+PLAYLIST_ID=''
+
+./.script playlist "https://www.youtube.com/playlist?list=${PLAYLIST_ID}" -t
+----
+https://www.youtube.com/watch?v=QLTdOEn79Rc&list=PLqnslRFeH2UqLwzS0AwKDKLrpYBKzLBy2
+https://www.youtube.com/results?search_query=python+programming+for+advance+user
+
+
+VIDEO_ID='xHql5yeGlnU'
+
+VIDEO_ID='tb7UatDBGAI'
+./.script video "https://www.youtube.com/watch?v=${VIDEO_ID}" -t
+
+---
+# To download a playlist with transcription:
+PLAYLIST_ID='PL7yh-TELLS1FuqLSjl5bgiQIEH25VEmIc'
+./parallel_container_run.sh playlist "https://www.youtube.com/playlist?list=${PLAYLIST_ID}" -t
+
+# To download a single video with transcript
+Pending: https://www.youtube.com/watch?v=VK-2j5CNsvM
+VIDEO_ID='VK-2j5CNsvM'
+./parallel_container_run.sh video "https://www.youtube.com/watch?v=${VIDEO_ID}"
